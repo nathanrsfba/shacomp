@@ -1,0 +1,135 @@
+.\" generated with Ronn/v0.7.3
+.\" http://github.com/rtomayko/ronn/tree/0.7.3
+.
+.TH "SHACOMP" "1" "August 2024" "shacomp 1.0" "SHACOMP Manual"
+.
+.SH "NAME"
+\fBshacomp\fR \- Compare SHA (or other) checksums between snapshots
+.
+.SH "SYNOPSIS"
+\fBshacomp\fR [\-N] [\-T] [\-h] [\-H] [\-f] [\-F] [\-u] [\-c ACTIVITY_CHARS] [\-\-help] file file [file \.\.\.]
+.
+.SH "DESCRIPTION"
+\fBshacomp\fR will read multiple files ("snapshots") of SHA (or other) checksums, and display a summary of what files were changed in between each one\.
+.
+.P
+Snapshots are expected to be in a format smilar to that output by \fBsha*sum\fR or \fBmd5sum\fR: A checksum, followed by some number of spaces, followed by the filename, one line per file\.
+.
+.P
+The simplest case is running \fBshacomp\fR on two checksum files, which will show what changes were detected between them\. This will produce a report similar to the following:
+.
+.IP "" 4
+.
+.nf
+
+\- /tmp/sortELfgNZ
+\- /tmp/sortL93Y32
++ /tmp/sortdxUTk2
++ /tmp/sorte9MJK5
+# /var/lib/mlocate/mlocate\.db
+# /var/lib/mysql/ib_logfile0
+.
+.fi
+.
+.IP "" 0
+.
+.P
+Each file is preceeded by a symbol which shows the nature of the change:
+.
+.IP "\(bu" 4
+A \fB+\fR indicates an "addition": It was present in the older digest, but not the newer\.
+.
+.IP "\(bu" 4
+A \fB\-\fR indicates a "deletion": It was present in the newer digest, but not the older\.
+.
+.IP "\(bu" 4
+A \fB#\fR indicates a "modification": It was present in both digests, but with a differing checksum\.
+.
+.IP "" 0
+.
+.P
+By default, files which are "unchanged" \-\- they exist in both digests, with the same checksum \-\- are not listed\.
+.
+.P
+\fBshacomp\fR can also compare multiple digest files\. If more than two files are provided, it will track changes across all of them, giving a more detailed report:
+.
+.IP "" 4
+.
+.nf
+
++\-\-telos\-digest\-1722816420\-Aug04\-05\.07pm\-0700\.sha
+|+\-\-telos\-digest\-1722830639\-Aug04\-09\.03pm\-0700\.sha
+||+\-\-telos\-digest\-1722926516\-Aug05\-11\.41pm\-0700\.sha
+|||+\-\-telos\-digest\-1723064401\-Aug07\-02\.00pm\-0700\.sha
+||||+\-\-telos\-digest\-1723150801\-Aug08\-02\.00pm\-0700\.sha
+|||||+\-\-telos\-digest\-1723237201\-Aug09\-02\.00pm\-0700\.sha
+||||||
++|#||| /etc/passwd
++##||| /etc/shadow
+|+\-||| /tmp/sort4hPmeO
+||||+| /var/spool/postfix/maildrop/0418E2C0C1A
+.
+.fi
+.
+.IP "" 0
+.
+.P
+The first few lines lists the checksum files provided\. Following that is a list of all files that were changed at any point, preceeded by a set of symbols showing where changes were detected\.
+.
+.P
+Each symbol represents one of the checksum files; it shows what changed in \fIthat\fR snapshot\. I\.E\. what changed between that snapshot and the \fIprevious\fR snapshot\.
+.
+.P
+The set of symbols are the same as in the first example, with one addition: A \fB|\fR indicates that a file was unchange between snapshots\. I\.E\. Either it appeared in both files, with the same checksum, or did not appear in either file\.
+.
+.P
+Note that this report includes a column for the \fIfirst\fR snapshot\. Since there is no "previous" snapshot to compare to (and thus, no meaningful possibility of "removal" or "modification"), this column will always contain either a \fB+\fR (if the file was present in the first snapshot), or a \fB|\fR (if it was not)\. This makes it slighly easier to see which snapshot a file first appeared in, and makes the display overall more consistent\.
+.
+.P
+Similar to the first example, a file will not be listed if it was unchanged across \fIall\fR snapshots\.
+.
+.SH "OPTIONS"
+.
+.TP
+\fB\-N\fR, \fB\-\-newest\-first\fR
+In order to generate a meaningful report, \fBshacomp\fR needs to know the chronological order of the checksum snapshots; otherwise, the "when" of file changes would get mixed up\. By default, \fBshacomp\fR assumes that the files given on the command line are in chronological order, from oldest to newest\. This option causes \fBshacomp\fR to assume they are provided in the reverse order\.
+.
+.TP
+\fB\-T\fR, \fB\-\-check\-timestamps\fR
+This option causes \fBshacomp\fR to check the timestamps of the snapshot files to see what order they should be processed in\. In this mode, it does not matter what order they are specified on the command line\.
+.
+.TP
+\fB\-h\fR, \fB\-\-header\fR
+Display a header showing the given snapshot files\. The default if more than 2 files are given\.
+.
+.TP
+\fB\-H\fR, \fB\-\-no\-header\fR
+Do not show the header
+.
+.TP
+\fB\-f\fR, \fB\-\-first\-file\-changes\fR
+Displays a column for the first snapshot\. The default if more than 2 files are given\.
+.
+.TP
+\fB\-F\fR, \fB\-\-no\-first\-file\-changes\fR
+Do not dispay a column for the first snapsnot\.
+.
+.TP
+\fB\-u\fR, \fB\-\-show\-unchanged\fR
+Include files that were unchanged across all snapshots
+.
+.TP
+\fB\-c\fR, \fB\-\-activity\-chars\fR
+Specify the symbols used to indicate each type of file change\. This should be a 4 character string where the symbol for unchanged, added, deleted, and modified files should be specified, in that order\. Default is "|+\-#"\.
+.
+.SH "NOTES"
+\fBshacomp\fR is written in Python\. It targets Python 3\.9, and thus will run using pypy\.
+.
+.P
+This manual page was created using ronn(1)\.
+.
+.SH "COPYRIGHT"
+\fBshacomp\fR is Copyright 2024 Nathan Roberts \fInroberts@tardislabs\.com\fR\.
+.
+.P
+It is distributed under the MIT License\.
