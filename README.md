@@ -136,10 +136,18 @@ NOTES
 
 This manual page was created using ronn(1).
 
+HISTORY
+-------
+
+* 1.0:
+  Initial version
+
+* 1.1:
+  Added `--preprocessor` option
+
 COPYRIGHT
 ----------
 
 `shacomp` is Copyright 2024 Nathan Roberts <nroberts@tardislabs.com>.
 
 This project is licensed under the terms of the MIT license.
-It is distributed under the MIT License.
