@@ -89,12 +89,9 @@ def main():
         # Digest data: Key=filename, value=hash
         data = {}
         with open( digestFile ) as f:
-            for line in f.readlines():
-                (sha, filename) = line.split( ' ', maxsplit=1 )
-                filename = filename.lstrip( ' ' ).rstrip( "\n" )
-                allFiles.add( filename )
-                data[filename] = sha
+            data = readDigests( f )
         digests.append( data )
+        allFiles |= set( data.keys() )
 
     # Sort file list
     files = list( allFiles )
@@ -152,6 +149,17 @@ def main():
         if anyChange or args.show_unchanged:
             print( f"{stat} {file}" )
 
+def readDigests( fd ):
+    """Read a snapshot file from the given file object.
+
+    Returns a dict with filenames as keys and checksums as values.
+    """
+    data = {}
+    for line in fd.readlines():
+        (sha, filename) = line.split( ' ', maxsplit=1 )
+        filename = filename.lstrip( ' ' ).rstrip( "\n" )
+        data[filename] = sha
+    return data
 
 if __name__ == "__main__":
     main()
