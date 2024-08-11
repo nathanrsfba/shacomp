@@ -5,6 +5,7 @@ from argparse import ArgumentParser
 from pathlib import Path
 from pprint import pp
 from sys import stderr
+from subprocess import Popen, PIPE
 
 def main():
     parser = ArgumentParser(
@@ -40,6 +41,9 @@ def main():
                         help='Characters to display for files that are '
                         'unchanged, added, removed, or modified. '
                         '(Default "|+-#")' )
+    parser.add_argument( '-p', '--preprocessor', 
+                        help='Send the content of each snapshot file through '
+                        'PREPROCESSOR. (Eg. gunzip, unxz, etc.)' )
     parser.add_argument( '--help', action='help',
                         help='Show this help message' )
 
@@ -86,10 +90,13 @@ def main():
 
     # Read all the digest files
     for digestFile in digestFiles:
-        # Digest data: Key=filename, value=hash
-        data = {}
         with open( digestFile ) as f:
-            data = readDigests( f )
+            if args.preprocessor:
+                with Popen( args.preprocessor, shell=True,
+                stdin=f, stdout=PIPE ) as proc:
+                    data = readDigests( proc.stdout )
+            else:
+                data = readDigests( f )
         digests.append( data )
         allFiles |= set( data.keys() )
 
@@ -156,6 +163,8 @@ def readDigests( fd ):
     """
     data = {}
     for line in fd.readlines():
+        if isinstance( line, bytes ):
+            line = line.decode()
         (sha, filename) = line.split( ' ', maxsplit=1 )
         filename = filename.lstrip( ' ' ).rstrip( "\n" )
         data[filename] = sha

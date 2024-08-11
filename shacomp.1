@@ -7,7 +7,7 @@
 \fBshacomp\fR \- Compare SHA (or other) checksums between snapshots
 .
 .SH "SYNOPSIS"
-\fBshacomp\fR [\-N] [\-T] [\-h] [\-H] [\-f] [\-F] [\-u] [\-c ACTIVITY_CHARS] [\-\-help] file file [file \.\.\.]
+\fBshacomp\fR [\-N] [\-T] [\-h] [\-H] [\-f] [\-F] [\-u] [\-c ACTIVITY\-CHARS] [\-p PREPROCESSOR] [\-\-help] file file [file \.\.\.]
 .
 .SH "DESCRIPTION"
 \fBshacomp\fR will read multiple files ("snapshots") of SHA (or other) checksums, and display a summary of what files were changed in between each one\.
@@ -122,6 +122,10 @@ Include files that were unchanged across all snapshots
 \fB\-c\fR, \fB\-\-activity\-chars\fR
 Specify the symbols used to indicate each type of file change\. This should be a 4 character string where the symbol for unchanged, added, deleted, and modified files should be specified, in that order\. Default is "|+\-#"\.
 .
+.TP
+\fB\-p\fR, \fB\-\-preprocessor\fR
+When reading the snapshot files, first pass their contents through the given program\. The content of the file will be sent to the program on stdin, and the result will be read in from stdout\. This is useful for, say, decompressing compressed snapshots on\-the\-fly by passing them through \fBgunzip\fR or \fBunxz\fR or similar\. The argument is passed through the system shell, so a pipeline or other shell construct may be given\.
+.
 .SH "NOTES"
 \fBshacomp\fR is written in Python\. It targets Python 3\.9, and thus will run using pypy\.
 .
@@ -132,4 +136,4 @@ This manual page was created using ronn(1)\.
 \fBshacomp\fR is Copyright 2024 Nathan Roberts \fInroberts@tardislabs\.com\fR\.
 .
 .P
-It is distributed under the MIT License\.
+This project is licensed under the terms of the MIT license\. It is distributed under the MIT License\.

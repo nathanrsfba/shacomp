@@ -4,7 +4,8 @@ shacomp(1) -- Compare SHA (or other) checksums between snapshots
 SYNOPSIS
 --------
 
-`shacomp` [-N] [-T] [-h] [-H] [-f] [-F] [-u] [-c ACTIVITY_CHARS] [--help] file file [file ...]
+`shacomp` [-N] [-T] [-h] [-H] [-f] [-F] [-u]
+  [-c ACTIVITY-CHARS] [-p PREPROCESSOR] [--help] file file [file ...]
 
 DESCRIPTION
 ------------
@@ -120,6 +121,14 @@ OPTIONS
   a 4 character string where the symbol for unchanged, added, deleted, and
   modified files should be specified, in that order. Default is "|+-#".
 
+* `-p`, `--preprocessor`:
+  When reading the snapshot files, first pass their contents through the given
+  program. The content of the file will be sent to the program on stdin, and
+  the result will be read in from stdout. This is useful for, say,
+  decompressing compressed snapshots on-the-fly by passing them through
+  `gunzip` or `unxz` or similar.  The argument is passed through the system
+  shell, so a pipeline or other shell construct may be given.
+
 NOTES
 -----
 
@@ -133,3 +142,4 @@ COPYRIGHT
 `shacomp` is Copyright 2024 Nathan Roberts <nroberts@tardislabs.com>.
 
 This project is licensed under the terms of the MIT license.
+It is distributed under the MIT License.
